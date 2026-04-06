@@ -626,6 +626,37 @@
     line-height: 1.2;
   }
 
+  /* LANG SWITCHER */
+  .lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 2rem;
+  }
+  .lang-btn {
+    background: transparent;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg-muted);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .lang-btn.active {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+    font-weight: 700;
+  }
+  .lang-btn:hover:not(.active) {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
   /* MOBILE */
   @media (max-width: 768px) {
     nav { padding: 1.2rem 1.5rem; }
@@ -657,6 +688,10 @@
     <li><a href="#" onclick="showPage('production')" id="nav-production">Production</a></li>
     <li><a href="#" onclick="showPage('contact')" id="nav-contact">Contato</a></li>
   </ul>
+  <div class="lang-switcher">
+    <span class="lang-btn active">PT</span>
+    <a class="lang-btn" href="index-en.html">EN</a>
+  </div>
 </nav>
 
 <!-- ════════════ HOME ════════════ -->
