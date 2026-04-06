@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fernanda Carlim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #181818;
+    --fg: #f0ede6;
+    --fg-muted: rgba(240,237,230,0.45);
+    --fg-dim: rgba(240,237,230,0.2);
+    --accent: #f0ede6;
+    --accent2: rgba(240,237,230,0.6);
+    --accent3: rgba(240,237,230,0.8);
+    --mono: 'Syne', sans-serif;
+    --serif: 'Instrument Serif', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, background 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor.hover { transform: scale(4); background: var(--accent); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2.5rem;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--fg-dim);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--accent); }
+
+  /* LANG SWITCHER */
+  .lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 2rem;
+  }
+  .lang-btn {
+    background: transparent;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg-muted);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .lang-btn.active {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+    font-weight: 700;
+  }
+  .lang-btn:hover:not(.active) {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
+  /* PAGES */
+  .page { display: none; min-height: 100vh; padding-top: 5rem; }
+  .page.active { display: block; }
+
+  /* ═══════════════════════════════
+     HOME
+  ═══════════════════════════════ */
+  #home {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #home.active { display: flex; }
+
+  .home-noise {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .home-grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--fg-dim) 1px, transparent 1px),
+      linear-gradient(90deg, var(--fg-dim) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .home-inner {
+    position: relative;
+    z-index: 2;
+    padding: 0 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .home-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .home-eyebrow::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--accent);
+  }
+
+  .home-title {
+    font-family: var(--serif);
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.92;
+    color: var(--fg);
+    margin-bottom: 0.2em;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .home-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .home-subtitle {
+    font-family: var(--mono);
+    font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+    color: var(--fg-muted);
+    max-width: 520px;
+    line-height: 1.8;
+    margin-top: 2.5rem;
+    margin-bottom: 3.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .home-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .tag {
+    border: 1px solid var(--fg-dim);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    border-radius: 2px;
+  }
+
+  .home-cta {
+    display: flex;
+    gap: 1.2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+
+  .btn {
+    padding: 0.85rem 2rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: var(--fg);
+    color: var(--bg);
+    font-weight: 700;
+  }
+  .btn-primary:hover { background: #ffffff; transform: translateY(-2px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--fg-dim);
+  }
+  .btn-ghost:hover { border-color: var(--fg); transform: translateY(-2px); }
+
+  .home-number {
+    position: fixed;
+    right: 2.5rem;
+    bottom: 3rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--fg-dim);
+    writing-mode: vertical-rl;
+    z-index: 10;
+  }
+
+  .home-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 2.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .home-scroll::after {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--fg-dim);
+    animation: scrollLine 2s 1.5s infinite;
+  }
+
+  @keyframes scrollLine {
+    0% { width: 30px; opacity: 1; }
+    50% { width: 60px; opacity: 0.5; }
+    100% { width: 30px; opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══════════════════════════════
+     ABOUT
+  ═══════════════════════════════ */
+  #about { padding-top: 8rem; }
+
+  .about-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .about-left {}
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  .about-bio {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    line-height: 1.25;
+    color: var(--fg);
+    margin-bottom: 2.5rem;
+  }
+  .about-bio em { color: var(--accent); font-style: italic; }
+
+  .about-body {
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+    line-height: 2;
+    margin-bottom: 2rem;
+  }
+
+  .about-right { padding-top: 4rem; }
+
+  .skills-block {
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--fg-dim);
+  }
+  .skills-block:last-child { border-bottom: none; }
+
+  .skills-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 1.2rem;
+  }
+
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .skill-chip {
+    background: var(--bg3);
+    border: 1px solid var(--fg-dim);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
+    color: var(--fg-muted);
+    transition: all 0.2s;
+  }
+  .skill-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .experience-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--fg-dim);
+  }
+  .experience-item:last-child { border-bottom: none; }
+  .exp-company { font-weight: 700; font-size: 0.8rem; color: var(--fg); margin-bottom: 0.3rem; }
+  .exp-role { font-size: 0.75rem; color: var(--fg-muted); }
+  .exp-year { font-size: 0.7rem; color: var(--fg-dim); text-align: right; white-space: nowrap; }
+
+  /* ═══════════════════════════════
+     PROJECTS (shared)
+  ═══════════════════════════════ */
+  .projects-page { padding-top: 8rem; }
+
+  .projects-header {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2.5rem 4rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .page-title {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1;
+    color: var(--fg);
+  }
+  .page-title em { color: var(--accent); font-style: italic; }
+
+  .projects-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  .project-card {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 2rem;
+    align-items: start;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--fg-dim);
+    transition: background 0.2s;
+    position: relative;
+  }
+  .project-card:last-child { border-bottom: 1px solid var(--fg-dim); }
+
+  .project-card:hover { padding-left: 1rem; padding-right: 1rem; margin: 0 -1rem; }
+
+  .project-num {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    padding-top: 0.4rem;
+  }
+
+  .project-body {}
+
+  .project-title {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    color: var(--fg);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+  .project-card:hover .project-title { color: var(--accent); }
+
+  .project-client {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 1rem;
+  }
+
+  .project-desc {
+    color: var(--fg-muted);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    max-width: 600px;
+    margin-bottom: 1.2rem;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .project-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    border: 1px solid var(--fg-dim);
+    padding: 0.25rem 0.6rem;
+  }
+
+  .project-tag.blue {
+    color: var(--fg-muted);
+    border-color: var(--fg-dim);
+  }
+
+  .project-tag.red {
+    color: var(--fg-muted);
+    border-color: var(--fg-dim);
+  }
+
+  .project-arrow {
+    font-size: 1.5rem;
+    color: var(--fg-dim);
+    padding-top: 0.2rem;
+    transition: all 0.2s;
+  }
+  .project-card:hover .project-arrow {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  /* Category accent bars */
+  .cat-product .project-num::before { content: '◆ '; color: var(--fg-muted); }
+  .cat-music .project-num::before { content: '◆ '; color: var(--fg-muted); }
+  .cat-production .project-num::before { content: '◆ '; color: var(--fg-muted); }
+
+  /* ═══════════════════════════════
+     CONTACT
+  ═══════════════════════════════ */
+  #contact { padding-top: 8rem; }
+
+  .contact-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  .contact-big {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.95;
+    color: var(--fg);
+    margin-bottom: 4rem;
+  }
+  .contact-big em { color: var(--accent); font-style: italic; }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 6rem;
+  }
+
+  .contact-item {
+    padding: 2rem;
+    border: 1px solid var(--fg-dim);
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+  .contact-item:hover { border-color: var(--accent); transform: translateY(-4px); }
+
+  .contact-item-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 0.8rem;
+  }
+
+  .contact-item-value {
+    font-size: 0.9rem;
+    color: var(--fg);
+    word-break: break-all;
+  }
+
+  .contact-item-arrow {
+    margin-top: 1.5rem;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  /* ═══════════════════════════════
+     FOOTER
+  ═══════════════════════════════ */
+  footer {
+    border-top: 1px solid var(--fg-dim);
+    padding: 2rem 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.65rem;
+    color: var(--fg-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* ═══════════════════════════════
+     TICKER
+  ═══════════════════════════════ */
+  .ticker-wrap {
+    border-top: 1px solid var(--fg-dim);
+    border-bottom: 1px solid var(--fg-dim);
+    overflow: hidden;
+    padding: 0.9rem 0;
+    margin-bottom: 4rem;
+    background: var(--bg2);
+  }
+
+  .ticker {
+    display: flex;
+    gap: 3rem;
+    animation: ticker 30s linear infinite;
+    white-space: nowrap;
+  }
+
+  .ticker span {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+
+  .ticker span.accent { color: var(--fg-muted); }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* HIGHLIGHT STRIPE */
+  .stripe {
+    background: #1a1a1a;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg);
+    padding: 3rem 2.5rem;
+    margin: 4rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .stripe-text {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    color: var(--fg);
+    line-height: 1.2;
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { gap: 1.2rem; }
+    .home-inner { padding: 0 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .projects-header { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 0 1.5rem 3rem; }
+    .project-card { grid-template-columns: 50px 1fr; }
+    .project-arrow { display: none; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .projects-grid { padding: 0 1.5rem; }
+    .contact-inner { padding: 0 1.5rem; }
+    footer { flex-direction: column; gap: 1rem; padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home')">FC</a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
+    <li><a href="#" onclick="showPage('about')" id="nav-about">About</a></li>
+    <li><a href="#" onclick="showPage('product')" id="nav-product">Product</a></li>
+    <li><a href="#" onclick="showPage('music')" id="nav-music">Music & Culture</a></li>
+    <li><a href="#" onclick="showPage('production')" id="nav-production">Production</a></li>
+    <li><a href="#" onclick="showPage('contact')" id="nav-contact">Contact</a></li>
+  </ul>
+  <div class="lang-switcher">
+    <a class="lang-btn" href="index.html">PT</a>
+    <span class="lang-btn active">EN</span>
+  </div>
+</nav>
+
+<!-- ════════════ HOME ════════════ -->
+<section id="home" class="page active">
+  <div class="home-noise"></div>
+  <div class="home-grid-lines"></div>
+  <div class="home-inner">
+    <div class="home-eyebrow">Portfolio — São Paulo, BR</div>
+    <h1 class="home-title">Fernanda<br><em>Carlim</em></h1>
+    <p class="home-subtitle">
+      Digital product and brand management at the intersection of<br>
+      technology, culture and creative operations —<br>
+      translating complexity into clear, scalable solutions.
+    </p>
+    <div class="home-tags">
+      <span class="tag">Product Management</span>
+      <span class="tag">Fintech</span>
+      <span class="tag">Creative Operations</span>
+      <span class="tag">Music Label</span>
+      <span class="tag">São Paulo, BR</span>
+    </div>
+    <div class="home-cta">
+      <button class="btn btn-primary" onclick="showPage('product')">View Projects</button>
+      <button class="btn btn-ghost" onclick="showPage('about')">About me</button>
+    </div>
+  </div>
+  <div class="home-scroll">scroll</div>
+  <div class="home-number">Fernanda Carlim — 2025</div>
+</section>
+
+<!-- ════════════ ABOUT ════════════ -->
+<section id="about" class="page">
+  <div class="about-grid">
+    <div class="about-left">
+      <div class="section-label">About</div>
+      <h2 class="about-bio">
+        Where digital product meets <em>creative culture.</em>
+      </h2>
+      <p class="about-body">
+        I'm Fe — a digital product and brand management professional working at the intersection of technology, culture and creative operations. I work on the development and evolution of complex digital products, focusing on workflow structuring, continuous improvement, operational efficiency and real business impact.
+      </p>
+      <p class="about-body">
+        I have a background in Communications, a specialization in Cultural Management, and since 2021 I've been deeply involved in digital product work — connecting strategic vision, hands-on execution and a thorough understanding of creative contexts. My experience spans financial products, ERPs, operational platforms and cultural projects, always seeking to translate complexity into clear, scalable and well-structured solutions.
+      </p>
+      <p class="about-body">
+        In parallel, I co-founded the label Perfecto Estado and the platform Cereal Melodia, where I work as executive producer and curator. In personal projects, I explore electronic music and other creative fronts as an extension of my product and culture perspective.
+      </p>
+      <p class="about-body">
+        This duality isn't a conflict — it's what makes me different.
+      </p>
+    </div>
+    <div class="about-right">
+      <div class="skills-block">
+        <div class="skills-title">Product & Tech</div>
+        <div class="skills-list">
+          <span class="skill-chip">Product Management</span>
+          <span class="skill-chip">Roadmapping</span>
+          <span class="skill-chip">User Research</span>
+          <span class="skill-chip">Onboarding</span>
+          <span class="skill-chip">Financial Services</span>
+          <span class="skill-chip">Payment Gateway</span>
+          <span class="skill-chip">SQL</span>
+          <span class="skill-chip">Analytics</span>
+          <span class="skill-chip">CRM</span>
+        </div>
+      </div>
+      <div class="skills-block">
+        <div class="skills-title">Culture & Production</div>
+        <div class="skills-list">
+          <span class="skill-chip">Music Curation</span>
+          <span class="skill-chip">Executive Production</span>
+          <span class="skill-chip">Event Management</span>
+          <span class="skill-chip">Influencer Marketing</span>
+          <span class="skill-chip">Audiovisual Production</span>
+          <span class="skill-chip">Art Direction</span>
+          <span class="skill-chip">Set Design</span>
+        </div>
+      </div>
+      <div class="skills-block">
+        <div class="skills-title">Experience</div>
+        <div class="experience-item">
+          <div>
+            <div class="exp-company">Landscape (Vitra / OS2 / Fore)</div>
+            <div class="exp-role">Product Manager</div>
+          </div>
+          <div class="exp-year">2022 — present</div>
+        </div>
+        <div class="experience-item">
+          <div>
+            <div class="exp-company">Perfecto Estado</div>
+            <div class="exp-role">Co-founder / Producer</div>
+          </div>
+          <div class="exp-year">2023 — present</div>
+        </div>
+        <div class="experience-item">
+          <div>
+            <div class="exp-company">CloudWalk / InfinitePay</div>
+            <div class="exp-role">Product Manager</div>
+          </div>
+          <div class="exp-year">2021 — 2023</div>
+        </div>
+        <div class="experience-item">
+          <div>
+            <div class="exp-company">Cereal Melodia</div>
+            <div class="exp-role">Co-founder</div>
+          </div>
+          <div class="exp-year">2019 — present</div>
+        </div>
+        <div class="experience-item">
+          <div>
+            <div class="exp-company">Void Lojas Gerais</div>
+            <div class="exp-role">Programming & Executive Production</div>
+          </div>
+          <div class="exp-year">2017 — 2020</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ PRODUCT ════════════ -->
+<section id="product" class="page projects-page">
+  <div class="projects-header">
+    <div>
+      <div class="section-label">Category 01</div>
+      <h2 class="page-title">Product<br><em>Management</em></h2>
+    </div>
+    <p style="max-width:340px; color:var(--fg-muted); font-size:0.8rem; line-height:1.8;">
+      Digital product development management — from creative platforms to financial solutions.
+    </p>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>Product Manager</span><span class="accent">◆</span>
+      <span>Roadmap</span><span class="accent">◆</span>
+      <span>Onboarding</span><span class="accent">◆</span>
+      <span>Fintech</span><span class="accent">◆</span>
+      <span>UX</span><span class="accent">◆</span>
+      <span>Analytics</span><span class="accent">◆</span>
+      <span>SaaS</span><span class="accent">◆</span>
+      <span>Payment Gateway</span><span class="accent">◆</span>
+      <span>Product Manager</span><span class="accent">◆</span>
+      <span>Roadmap</span><span class="accent">◆</span>
+      <span>Onboarding</span><span class="accent">◆</span>
+      <span>Fintech</span><span class="accent">◆</span>
+      <span>UX</span><span class="accent">◆</span>
+      <span>Analytics</span><span class="accent">◆</span>
+      <span>SaaS</span><span class="accent">◆</span>
+      <span>Payment Gateway</span><span class="accent">◆</span>
+    </div>
+  </div>
+
+  <div class="projects-grid">
+
+    <div class="project-card cat-product">
+      <div class="project-num">001</div>
+      <div class="project-body">
+        <div class="project-client">Landscape</div>
+        <h3 class="project-title">OS2 — Creative Project Management</h3>
+        <p class="project-desc">
+          All-in-one platform for production companies, agencies and design studios. Centralizes budgeting, financial management and relationships with suppliers and clients, with automated payment flows and integrated vendor management.
+        </p>
+        <p class="project-desc">
+          Led development, validation and pre-launch testing. Managed data migration from the previous system, developed the onboarding flow, conducted user training sessions and integrated the payment gateway.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag blue">SaaS</span>
+          <span class="project-tag blue">Onboarding</span>
+          <span class="project-tag blue">Data Migration</span>
+          <span class="project-tag blue">Financial Management</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-product">
+      <div class="project-num">002</div>
+      <div class="project-body">
+        <div class="project-client">Landscape</div>
+        <h3 class="project-title">Fore — Payment Anticipation</h3>
+        <p class="project-desc">
+          Payment anticipation solution for the Brazilian market: suppliers gain better cash flow predictability while companies achieve greater efficiency and profitability. Participated in defining workflows, integrations and operational rules.
+        </p>
+        <p class="project-desc">
+          Product production management, data analysis for decision-making, continuous improvement, payment gateway integration and development of the new user onboarding flow.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag blue">Financial Product</span>
+          <span class="project-tag blue">Financial Automation</span>
+          <span class="project-tag blue">Payment Gateway</span>
+          <span class="project-tag blue">Analytics</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-product">
+      <div class="project-num">003</div>
+      <div class="project-body">
+        <div class="project-client">Landscape</div>
+        <h3 class="project-title">Vitra — Visual References Platform</h3>
+        <p class="project-desc">
+          A visual references newsletter transformed into a digital consultation and inspiration platform for photography, video and visual arts professionals. Over 200 editions organized interactively, with filters by theme, author and format, and a personal collections system.
+        </p>
+        <p class="project-desc">
+          As PM: initial planning, information architecture and feature definition, design and usability oversight, migration of editions to the digital environment and coordination of multidisciplinary teams.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag blue">Product Management</span>
+          <span class="project-tag blue">Information Architecture</span>
+          <span class="project-tag blue">Data Migration</span>
+          <span class="project-tag blue">UX</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-product">
+      <div class="project-num">004</div>
+      <div class="project-body">
+        <div class="project-client">Landscape / Model Services</div>
+        <h3 class="project-title">Kura — Website Redesign & Visual Direction</h3>
+        <p class="project-desc">
+          Commercial development, client management and development oversight for the redesign of Kura's website, an art curation company. The project involved benchmark research, moodboard creation and interface design — resulting in a layout that integrates elements of the previous site with a renewed structure aligned to the brand's artistic identity.
+        </p>
+        <p class="project-desc">
+          The front-end restructuring was developed in partnership with BE TALENT. I acted as the point of contact between the client and the technical team, ensuring expectation alignment, delivery quality and process fluidity.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag blue">Business Development</span>
+          <span class="project-tag blue">Development Management</span>
+          <span class="project-tag blue">Client Services</span>
+          <span class="project-tag blue">Website Redesign</span>
+        </div>
+      </div>
+      <div class="project-arrow"><a href="https://model.services/projects/kura" target="_blank" style="color:inherit;text-decoration:none;">↗</a></div>
+    </div>
+
+    <div class="project-card cat-product">
+      <div class="project-num">005</div>
+      <div class="project-body">
+        <div class="project-client">CloudWalk / InfinitePay — 2021–2023</div>
+        <h3 class="project-title">Product Management — Financial Services</h3>
+        <p class="project-desc">
+          Digital product management focused on financial services for InfinitePay, a fintech within the CloudWalk ecosystem. Focus on card-not-present products: Ecommerce, Payment Links, Invoice/Collections Management, Rate Calculator and Web Receipts.
+        </p>
+        <p class="project-desc">
+          Direct exposure to the fintech ecosystem and the challenges of financial transactions, reconciliation, acquirer integrations and critical business rules — expanding knowledge in compliance, security and payment systems scalability.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag blue">Fintech</span>
+          <span class="project-tag blue">Ecommerce</span>
+          <span class="project-tag blue">SQL</span>
+          <span class="project-tag blue">CRM</span>
+          <span class="project-tag blue">Reconciliation</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-product">
+      <div class="project-num">006</div>
+      <div class="project-body">
+        <div class="project-client">CloudWalk / InfinitePay — 2021–2023</div>
+        <h3 class="project-title">Influencer Marketing & Special Projects</h3>
+        <p class="project-desc">
+          Strategy and management of special projects in partnership with creators, influencers and real brand customers. Including the <em>Create The Future</em> project — commissions with Brazilian designers and artists on the future of economy and technology — and the <em>Na Prática</em> series, featuring real entrepreneur stories.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag blue">Influencer Marketing</span>
+          <span class="project-tag blue">Branded Content</span>
+          <span class="project-tag blue">Special Projects</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ MUSIC ════════════ -->
+<section id="music" class="page projects-page">
+  <div class="projects-header">
+    <div>
+      <div class="section-label">Category 02</div>
+      <h2 class="page-title">Music &<br><em>Culture</em></h2>
+    </div>
+    <p style="max-width:340px; color:var(--fg-muted); font-size:0.8rem; line-height:1.8;">
+      Curation, production and project management in the world of electronic music and independent Brazilian culture.
+    </p>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>House Music</span><span class="accent">◆</span>
+      <span>Disco</span><span class="accent">◆</span>
+      <span>Curation</span><span class="accent">◆</span>
+      <span>Label</span><span class="accent">◆</span>
+      <span>Executive Production</span><span class="accent">◆</span>
+      <span>Cereal Melodia</span><span class="accent">◆</span>
+      <span>Perfecto Estado</span><span class="accent">◆</span>
+      <span>House Music</span><span class="accent">◆</span>
+      <span>Disco</span><span class="accent">◆</span>
+      <span>Curation</span><span class="accent">◆</span>
+      <span>Label</span><span class="accent">◆</span>
+      <span>Executive Production</span><span class="accent">◆</span>
+      <span>Cereal Melodia</span><span class="accent">◆</span>
+      <span>Perfecto Estado</span><span class="accent">◆</span>
+    </div>
+  </div>
+
+  <div class="projects-grid">
+
+    <div class="project-card cat-music">
+      <div class="project-num">001</div>
+      <div class="project-body">
+        <div class="project-client">Perfecto Estado</div>
+        <h3 class="project-title">Noporn — Adoro DJs</h3>
+        <p class="project-desc">
+          Executive production and curation of the debut album for the Perfecto Estado label. Celebrating 20 years of Noporn's career, the album brings together 13 remixes of classic hits by the duo, featuring artists such as Baroque Angel, FKOFF1963, Rico Jorge, Alírio, Guza and others — representing a contemporary, queer and avant-garde Brazil.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Executive Production</span>
+          <span class="project-tag">Curation</span>
+          <span class="project-tag">Album Release</span>
+          <span class="project-tag">House / Disco</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">002</div>
+      <div class="project-body">
+        <div class="project-client">Perfecto Estado</div>
+        <h3 class="project-title">Paulete Lindacelva — Guabiraba Chicago</h3>
+        <p class="project-desc">
+          Production and press for the debut EP of Pernambuco-based multi-artist Paulete Lindacelva, celebrating 10 years of her career as a DJ. Featuring BADSISTA, Gabto, L_cio and Paola Lappicy, the EP traces a path between Guabiraba and Chicago — between a Recife neighbourhood and the roots of House Music.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Production</span>
+          <span class="project-tag">Press</span>
+          <span class="project-tag">EP</span>
+          <span class="project-tag">House Music</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">003</div>
+      <div class="project-body">
+        <div class="project-client">Perfecto Estado</div>
+        <h3 class="project-title">Levi Lenzi — Preciso De Um Break</h3>
+        <p class="project-desc">
+          Executive production of Levi Lenzi's third EP, exploring Ambient and Breakbeat. With creative direction by Paulo Rodriguez, the project blends analogue video with digital filters. Includes remixes by Gabto and TYV.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Executive Production</span>
+          <span class="project-tag">Ambient</span>
+          <span class="project-tag">Breakbeat</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">004</div>
+      <div class="project-body">
+        <div class="project-client">Perfecto Estado</div>
+        <h3 class="project-title">Paraísos Invisibles — V.A.</h3>
+        <p class="project-desc">
+          The label's first various artists album, released in Portuñhol as a linguistic and cultural experiment connecting artists from Brazil and Latin America. The visual and written communication was part of the final thesis for a Branding Master's degree at Elisava, in partnership with Leonardo Pissetti.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Creative Direction</span>
+          <span class="project-tag">Branding</span>
+          <span class="project-tag">Compilation</span>
+          <span class="project-tag">Latin America</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">005</div>
+      <div class="project-body">
+        <div class="project-client">Cereal Melodia</div>
+        <h3 class="project-title">Co-founder & Producer</h3>
+        <p class="project-desc">
+          Platform created in São Paulo to listen to, spread and discuss music in its most diverse forms. I work on the executive production of projects and recordings, as well as curating the musical programming. Since 2019.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Co-founder</span>
+          <span class="project-tag">Executive Production</span>
+          <span class="project-tag">Curation</span>
+          <span class="project-tag">Podcasts</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">006</div>
+      <div class="project-body">
+        <div class="project-client">Mote / Cereal Melodia</div>
+        <h3 class="project-title">Outros Fins: Que Não a Morte</h3>
+        <p class="project-desc">
+          Digital art publication created by Paulete LindaCelva and produced by the Cereal Melodia platform, with executive production and project management. Brings together works from 23 artists — visuals, texts and programming. Launched in June 2020, at the height of the Covid-19 crisis.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Executive Production</span>
+          <span class="project-tag">Digital Art</span>
+          <span class="project-tag">Publication</span>
+          <span class="project-tag">Curation</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">007</div>
+      <div class="project-body">
+        <div class="project-client">Void Lojas Gerais</div>
+        <h3 class="project-title">Void Events — 450+ productions</h3>
+        <p class="project-desc">
+          Responsible for the programming and executive production of over 450 events across São Paulo locations between 2017 and 2020. Partnerships with Mimpi Film Festival, Dekmantel, SP na Rua, Virada Cultural, Nike, Adidas, Vans, RedBull, Converse and many others.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">Executive Production</span>
+          <span class="project-tag">Cultural Programming</span>
+          <span class="project-tag">Brand Activation</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-music">
+      <div class="project-num">008</div>
+      <div class="project-body">
+        <div class="project-client">Fernanda Carlim</div>
+        <h3 class="project-title">Mixtapes & Live Recordings</h3>
+        <p class="project-desc">
+          Mixtapes, podcasts and live recordings for national and international parties and music labels. DJing since 2013, navigating through House, Jazz, Breaks and Disco.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag">DJ</span>
+          <span class="project-tag">House</span>
+          <span class="project-tag">Jazz</span>
+          <span class="project-tag">Breaks</span>
+          <span class="project-tag">Disco</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ PRODUCTION ════════════ -->
+<section id="production" class="page projects-page">
+  <div class="projects-header">
+    <div>
+      <div class="section-label">Category 03</div>
+      <h2 class="page-title">Audio-<br><em>visual</em></h2>
+    </div>
+    <p style="max-width:340px; color:var(--fg-muted); font-size:0.8rem; line-height:1.8;">
+      Production and assistant direction on campaigns for national and international brands.
+    </p>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>Audiovisual Production</span><span class="accent">◆</span>
+      <span>Set Design</span><span class="accent">◆</span>
+      <span>Assistant Direction</span><span class="accent">◆</span>
+      <span>Cannes</span><span class="accent">◆</span>
+      <span>Branded Content</span><span class="accent">◆</span>
+      <span>Audiovisual Production</span><span class="accent">◆</span>
+      <span>Set Design</span><span class="accent">◆</span>
+      <span>Assistant Direction</span><span class="accent">◆</span>
+      <span>Cannes</span><span class="accent">◆</span>
+      <span>Branded Content</span><span class="accent">◆</span>
+    </div>
+  </div>
+
+  <div class="projects-grid">
+
+    <div class="project-card cat-production">
+      <div class="project-num">001</div>
+      <div class="project-body">
+        <div class="project-client">Guaraná Antarctica / Agência Soko / Clava</div>
+        <h3 class="project-title">Presas nos 80 — Cannes Winner</h3>
+        <p class="project-desc">
+          Set production for the Cannes-winning campaign "Presas nos 80" for Guaraná Antarctica, produced by Clava with Agência Soko.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag red">Set Production</span>
+          <span class="project-tag red">Cannes</span>
+          <span class="project-tag red">Campaign</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-production">
+      <div class="project-num">002</div>
+      <div class="project-body">
+        <div class="project-client">Beck's Beer</div>
+        <h3 class="project-title">73Hz — Set Design</h3>
+        <p class="project-desc">
+          Set design for the Beck's 73Hz campaign, which invited producers Vintage Culture and Kvsh to tell the story of the sound frequency created to intensify the taste of the beer.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag red">Set Design</span>
+          <span class="project-tag red">Branded Content</span>
+          <span class="project-tag red">Music</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-production">
+      <div class="project-num">003</div>
+      <div class="project-body">
+        <div class="project-client">Decathlon / Olaian</div>
+        <h3 class="project-title">Indonesia Collection 2020/2021</h3>
+        <p class="project-desc">
+          Assistant direction for the national campaign of Olaian, Decathlon's surf brand. Summer collection inspired by Indonesia. Directed by Lucas Neves, Flow Cinema.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag red">Assistant Direction</span>
+          <span class="project-tag red">National Campaign</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-production">
+      <div class="project-num">004</div>
+      <div class="project-body">
+        <div class="project-client">Samsung / GQ Brasil</div>
+        <h3 class="project-title">Galaxy Z Fold 2 — Campos do Jordão</h3>
+        <p class="project-desc">
+          Assistant direction for the Galaxy Z Fold 2 launch campaign, in partnership with GQ Brasil and Casa Vogue. DJ and producer Thiago Mansur on a two-day immersion in Campos do Jordão countryside.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag red">Assistant Direction</span>
+          <span class="project-tag red">Samsung</span>
+          <span class="project-tag red">GQ Brasil</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-production">
+      <div class="project-num">005</div>
+      <div class="project-body">
+        <div class="project-client">InfinitePay / Grupo Sal</div>
+        <h3 class="project-title">Rider x NBA — Executive Production</h3>
+        <p class="project-desc">
+          Executive production for the NBA x Rider campaign, in partnership with Grupo Sal agency.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag red">Executive Production</span>
+          <span class="project-tag red">NBA</span>
+          <span class="project-tag red">Campaign</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+    <div class="project-card cat-production">
+      <div class="project-num">006</div>
+      <div class="project-body">
+        <div class="project-client">Void / ZDeli</div>
+        <h3 class="project-title">Void TV & Jota Hamburgers</h3>
+        <p class="project-desc">
+          Creation and production of the video content displayed on the TVs across Void stores in São Paulo — internal communication visuals styled with stock products. Also project management and brand and content development for Jota Hamburguers, part of the ZDeli group.
+        </p>
+        <div class="project-tags">
+          <span class="project-tag red">Production</span>
+          <span class="project-tag red">Branded Content</span>
+          <span class="project-tag red">Branding</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ CONTACT ════════════ -->
+<section id="contact" class="page">
+  <div class="contact-inner">
+    <div class="section-label">Contact</div>
+    <h2 class="contact-big">
+      Let's<br>
+      work<br>
+      <em>together?</em>
+    </h2>
+
+    <div class="contact-grid">
+      <a class="contact-item" href="/cdn-cgi/l/email-protection#c5a3a0b7a6a4b7a9aca885a2a8a4aca9eba6aaa8">
+        <div class="contact-item-label">Email</div>
+        <div class="contact-item-value">fercarlim<br>@gmail.com</div>
+        <div class="contact-item-arrow">→ Send email</div>
+      </a>
+      <a class="contact-item" href="https://www.linkedin.com/in/fernanda-garbossa-carlim/" target="_blank">
+        <div class="contact-item-label">LinkedIn</div>
+        <div class="contact-item-value">fernanda-garbossa<br>-carlim</div>
+        <div class="contact-item-arrow">→ View profile</div>
+      </a>
+      <a class="contact-item" href="https://soundcloud.com/fcrlm" target="_blank">
+        <div class="contact-item-label">SoundCloud</div>
+        <div class="contact-item-value">soundcloud.com/<br>fcrlm</div>
+        <div class="contact-item-arrow">→ Listen to mixtapes</div>
+      </a>
+    </div>
+
+    <div class="stripe">
+      <div class="stripe-text">
+        PM · Culture · Music<br>São Paulo, BR
+      </div>
+      <button class="btn" style="background:var(--fg); color:var(--bg); font-weight:700;" onclick="showPage('product')">
+        View Projects →
+      </button>
+    </div>
+
+  </div>
+  <footer>
+    <span>Fernanda Carlim — 2025</span>
+    <span>Product Manager & Cultural Producer</span>
+    <span>São Paulo, BR</span>
+  </footer>
+</section>
+
+
+<script>
+  // PAGE NAVIGATION — global para funcionar com onclick
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(function(p) {
+      p.classList.remove('active');
+      p.style.display = 'none';
+    });
+    document.querySelectorAll('.nav-links a').forEach(function(a) {
+      a.classList.remove('active');
+    });
+    var page = document.getElementById(id);
+    if (page) {
+      page.style.display = id === 'home' ? 'flex' : 'block';
+      page.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    var navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.add('active');
+    return false;
+  }
+
+  // CURSOR + INIT
+  document.addEventListener('DOMContentLoaded', function() {
+    var cursor = document.getElementById('cursor');
+    if (cursor) {
+      document.addEventListener('mousemove', function(e) {
+        cursor.style.left = (e.clientX - 5) + 'px';
+        cursor.style.top = (e.clientY - 5) + 'px';
+      });
+      document.querySelectorAll('a, button, .project-card, .contact-item, .skill-chip').forEach(function(el) {
+        el.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
+        el.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+      });
+    }
+    document.querySelectorAll('.nav-links a').forEach(function(a) {
+      a.addEventListener('click', function(e) { e.preventDefault(); });
+    });
+    showPage('home');
+  });
+</script>
+</body>
+</html>
